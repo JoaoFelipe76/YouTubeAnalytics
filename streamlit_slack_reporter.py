@@ -27,7 +27,7 @@ SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL", "#youtube-analytics")
 
 # Configuração da API
 API_KEY = 'AIzaSyCswbMKKorlHVSA_9kWSS9ZIKogaurZdNA'
-CHANNEL_URL = 'https://youtube.com/@letsmediaoficial?si=Fk-kf1JqYBjj2LA0'
+CHANNEL_ID = 'UCOGXxTlgAvLJHxrfMrq4i0A'  # ID exato do canal
 
 class StreamlitSlackReporter:
     def __init__(self, token=SLACK_API_TOKEN, channel=SLACK_CHANNEL):
@@ -36,7 +36,7 @@ class StreamlitSlackReporter:
         self.client = WebClient(token=token)
         
         # Inicializa o analisador YouTube
-        self.analyzer = YouTubeAnalytics(API_KEY, channel_url=CHANNEL_URL)
+        self.analyzer = YouTubeAnalytics(API_KEY, channel_id=CHANNEL_ID)
         self.channel_info = self.analyzer.get_channel_info()
         self.df_videos = self.analyzer.get_channel_historical_data(video_count=100)
         

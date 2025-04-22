@@ -19,16 +19,16 @@ st.set_page_config(
 
 # Configuração da API
 API_KEY = 'AIzaSyCswbMKKorlHVSA_9kWSS9ZIKogaurZdNA'
-CHANNEL_URL = 'https://youtube.com/@letsmediaoficial?si=Fk-kf1JqYBjj2LA0'
+CHANNEL_ID = 'UCOGXxTlgAvLJHxrfMrq4i0A'  # ID exato do canal
 
 # Título principal
 st.title("Análise do Canal Let's Media Oficial")
 
 try:
-    # Inicialização da classe de análise usando a URL exata
+    # Inicialização da classe de análise usando o ID exato do canal
     @st.cache_resource
     def get_analyzer():
-        return YouTubeAnalytics(API_KEY, channel_url=CHANNEL_URL)
+        return YouTubeAnalytics(API_KEY, channel_id=CHANNEL_ID)
 
     analyzer = get_analyzer()
 

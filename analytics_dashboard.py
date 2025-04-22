@@ -14,10 +14,10 @@ from statsmodels.tsa.arima.model import ARIMA
 
 # Configuração da API
 API_KEY = 'AIzaSyCswbMKKorlHVSA_9kWSS9ZIKogaurZdNA'
-CHANNEL_URL = 'https://youtube.com/@letsmediaoficial?si=Fk-kf1JqYBjj2LA0'
+CHANNEL_ID = 'UCOGXxTlgAvLJHxrfMrq4i0A'  # ID exato do canal
 
 # Inicialização da classe de análise
-analyzer = YouTubeAnalytics(API_KEY, channel_url=CHANNEL_URL)
+analyzer = YouTubeAnalytics(API_KEY, channel_id=CHANNEL_ID)
 
 # Verifica se o canal foi encontrado
 channel_info = analyzer.get_channel_info()

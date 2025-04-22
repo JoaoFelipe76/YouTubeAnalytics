@@ -12,12 +12,88 @@ class YouTubeAnalytics:
         self.channel_id = channel_id
         
         if channel_url and not channel_id:
-            # Extrair channel ID da URL se fornecida
-            if '@' in channel_url:
-                handle = channel_url.split('@')[-1]
-                self.channel_id = self._get_channel_id_from_handle(handle)
-            else:
-                self.channel_id = self._extract_channel_id(channel_url)
+            # Vamos tentar várias abordagens para encontrar o canal
+            self.channel_id = self._find_channel_from_url(channel_url)
+    
+    def _find_channel_from_url(self, url):
+        """Método principal para encontrar canais, tenta várias abordagens"""
+        print(f"Tentando encontrar canal a partir da URL: {url}")
+        
+        # Tenta extrair handle do url
+        handle = None
+        if '@' in url:
+            handle = url.split('@')[1].split('?')[0].split('/')[0]
+            print(f"Handle extraído: {handle}")
+        
+        # Abordagem 1: Busca pelo handle exato, apenas no Brasil
+        if handle:
+            try:
+                print(f"Buscando canais no Brasil com handle: @{handle}")
+                request = self.youtube.search().list(
+                    part="snippet",
+                    q=f"@{handle}",
+                    type="channel",
+                    regionCode="BR",
+                    relevanceLanguage="pt",
+                    maxResults=5
+                )
+                response = request.execute()
+                
+                if response.get('items'):
+                    for item in response['items']:
+                        print(f"Canal encontrado: {item['snippet']['title']}")
+                        print(f"Channel ID: {item['snippet']['channelId']}")
+                        # Se o título contém "Let's Media", vamos usá-lo
+                        if "let's media" in item['snippet']['title'].lower():
+                            print(f"Canal encontrado pelo título: {item['snippet']['title']}")
+                            return item['snippet']['channelId']
+                    
+                    # Se não encontrou por título específico, usa o primeiro
+                    print(f"Usando primeiro canal encontrado: {response['items'][0]['snippet']['title']}")
+                    return response['items'][0]['snippet']['channelId']
+            except Exception as e:
+                print(f"Erro na busca por handle: {e}")
+        
+        # Abordagem 2: Busca direta pelo nome específico "Let's Media Oficial"
+        try:
+            print("Buscando pelo nome específico 'Let's Media Oficial'")
+            request = self.youtube.search().list(
+                part="snippet",
+                q="Let's Media Oficial",
+                type="channel",
+                regionCode="BR",
+                relevanceLanguage="pt",
+                maxResults=5
+            )
+            response = request.execute()
+            
+            if response.get('items'):
+                for item in response['items']:
+                    print(f"Canal encontrado: {item['snippet']['title']}")
+                    return item['snippet']['channelId']
+        except Exception as e:
+            print(f"Erro na busca pelo nome específico: {e}")
+        
+        # Abordagem 3: Última tentativa, busca genérica
+        try:
+            print("Última tentativa: busca genérica por 'letsmediaoficial'")
+            request = self.youtube.search().list(
+                part="snippet",
+                q="letsmediaoficial",
+                type="channel",
+                regionCode="BR",
+                maxResults=1
+            )
+            response = request.execute()
+            
+            if response.get('items'):
+                print(f"Canal encontrado na busca genérica: {response['items'][0]['snippet']['title']}")
+                return response['items'][0]['snippet']['channelId']
+        except Exception as e:
+            print(f"Erro na busca genérica: {e}")
+        
+        print("Nenhum canal encontrado após várias tentativas")
+        return None
     
     def search_channel_by_name(self, channel_name):
         """Busca o canal diretamente pelo nome exato"""
@@ -27,6 +103,8 @@ class YouTubeAnalytics:
                 part="snippet",
                 q=channel_name,
                 type="channel",
+                regionCode="BR",
+                relevanceLanguage="pt",
                 maxResults=5
             )
             response = request.execute()
@@ -36,10 +114,12 @@ class YouTubeAnalytics:
                 title = item['snippet']['title']
                 print(f"Encontrado canal: {title}")
                 if title.lower() == channel_name.lower() or title.lower().startswith(channel_name.lower()):
+                    print(f"Correspondência exata encontrada: {title}")
                     return item['snippet']['channelId']
             
             # Se não encontrou uma correspondência exata, retorna o primeiro resultado
             if response.get('items'):
+                print(f"Usando primeiro resultado: {response['items'][0]['snippet']['title']}")
                 return response['items'][0]['snippet']['channelId']
                 
             return None
@@ -47,87 +127,16 @@ class YouTubeAnalytics:
             print(f"Erro ao buscar canal pelo nome: {e}")
             return None
     
-    def _get_channel_id_from_handle(self, handle):
-        """Busca o ID do canal a partir do handle (@nome)"""
-        try:
-            request = self.youtube.search().list(
-                part="snippet",
-                q=f"@{handle}",
-                type="channel",
-                maxResults=1
-            )
-            response = request.execute()
-            
-            if response.get('items'):
-                return response['items'][0]['snippet']['channelId']
-        except HttpError as e:
-            print(f"Erro ao buscar handle do canal: {e}")
-            
-        return None
-    
-    def _get_channel_id_from_username(self, username):
-        try:
-            request = self.youtube.channels().list(
-                part="id",
-                forUsername=username
-            )
-            response = request.execute()
-            
-            if response.get('items'):
-                return response['items'][0]['id']
-        except HttpError as e:
-            print(f"Erro ao buscar username do canal: {e}")
-            
-        return None
-    
-    def _extract_channel_id(self, url):
-        """Extrai o ID do canal de diferentes formatos de URL"""
-        try:
-            # Caso 1: URLs com '/channel/' - contém ID diretamente
-            if 'channel/' in url:
-                return url.split('channel/')[-1].split('/')[0].split('?')[0]
-                
-            # Caso 2: URLs com handle (@nome)
-            if '@' in url:
-                handle = url.split('@')[-1].split('?')[0].split('/')[0]
-                print(f"Extraindo handle: @{handle}")
-                
-                # Busca direta pelo handle
-                request = self.youtube.search().list(
-                    part="snippet",
-                    q=f"@{handle}",
-                    type="channel",
-                    maxResults=5
-                )
-                response = request.execute()
-                
-                # Tenta encontrar uma correspondência exata ou próxima
-                for item in response.get('items', []):
-                    if item['snippet'].get('customUrl', '').lower() == f"@{handle}".lower():
-                        return item['snippet']['channelId']
-                
-                # Se não achou correspondência exata, pega o primeiro resultado
-                if response.get('items'):
-                    print(f"Canal encontrado: {response['items'][0]['snippet']['title']}")
-                    return response['items'][0]['snippet']['channelId']
-            
-            # Caso 3: URLs com '/user/' - precisa buscar pelo username
-            if 'user/' in url:
-                username = url.split('user/')[-1].split('/')[0].split('?')[0]
-                return self._get_channel_id_from_username(username)
-                
-            # Tenta outros métodos se necessário
-            return None
-        except Exception as e:
-            print(f"Erro ao extrair ID do canal da URL: {e}")
-            return None
-    
     def get_channel_info(self):
         try:
             if not self.channel_id:
-                print("ID do canal não encontrado")
-                return None
+                print("ID do canal não encontrado. Tentando última busca pelo nome.")
+                self.channel_id = self.search_channel_by_name("Let's Media Oficial")
+                if not self.channel_id:
+                    print("ID do canal não encontrado após todas as tentativas.")
+                    return None
                 
+            print(f"Buscando informações para channel_id: {self.channel_id}")
             request = self.youtube.channels().list(
                 part="snippet,contentDetails,statistics",
                 id=self.channel_id
@@ -148,8 +157,10 @@ class YouTubeAnalytics:
                     'viewCount': int(channel['statistics'].get('viewCount', 0)),
                     'playlistId': channel['contentDetails']['relatedPlaylists']['uploads']
                 }
+                print(f"Canal encontrado: {info['title']}")
                 return info
             else:
+                print("Nenhum canal encontrado com este ID.")
                 return None
         except HttpError as e:
             print(f"Erro ao obter informações do canal: {e}")
