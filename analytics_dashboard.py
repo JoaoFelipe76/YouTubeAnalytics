@@ -14,7 +14,7 @@ from statsmodels.tsa.arima.model import ARIMA
 
 # Configuração da API
 API_KEY = 'AIzaSyCswbMKKorlHVSA_9kWSS9ZIKogaurZdNA'
-CHANNEL_URL = 'https://www.youtube.com/@LetsMediaOficia'
+CHANNEL_URL = 'https://www.youtube.com/@LetsMediaOficial'
 
 # Inicialização da classe de análise
 analyzer = YouTubeAnalytics(API_KEY, channel_url=CHANNEL_URL)

@@ -1,6 +1,6 @@
-# Análise de Canal do YouTube - Let's Media Oficia
+# Análise de Canal do YouTube - Let's Media Oficial
 
-Esta aplicação fornece uma análise detalhada do desempenho do canal do YouTube "Let's Media Oficia" usando a API do YouTube e ferramentas modernas de análise de dados em Python.
+Esta aplicação fornece uma análise detalhada do desempenho do canal do YouTube "Let's Media Oficial" usando a API do YouTube e ferramentas modernas de análise de dados em Python.
 
 ## Funcionalidades
 
@@ -48,7 +48,7 @@ Após iniciar, acesse o dashboard em seu navegador em: `http://127.0.0.1:8050/`
 
 ## Configuração
 
-A aplicação está configurada para analisar o canal "Let's Media Oficia", mas você pode modificar as variáveis `API_KEY` e `CHANNEL_URL` no arquivo `analytics_dashboard.py` para analisar outros canais.
+A aplicação está configurada para analisar o canal "Let's Media Oficial", mas você pode modificar as variáveis `API_KEY` e `CHANNEL_URL` no arquivo `analytics_dashboard.py` para analisar outros canais.
 
 ## Estrutura do Projeto
 

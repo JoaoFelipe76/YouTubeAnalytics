@@ -12,7 +12,7 @@ from sklearn.linear_model import LinearRegression
 
 # Configuração da página
 st.set_page_config(
-    page_title="Análise do Canal Let's Media Oficia",
+    page_title="Análise do Canal Let's Media Oficial",
     page_icon="📊",
     layout="wide"
 )
@@ -21,7 +21,7 @@ st.set_page_config(
 API_KEY = 'AIzaSyCswbMKKorlHVSA_9kWSS9ZIKogaurZdNA'
 
 # Título principal
-st.title("Análise do Canal Let's Media Oficia")
+st.title("Análise do Canal Let's Media Oficial")
 
 try:
     # Inicialização da classe de análise usando busca direta
@@ -29,14 +29,14 @@ try:
     def get_analyzer():
         analyzer = YouTubeAnalytics(API_KEY)
         # Busca o canal pelo nome exato
-        channel_id = analyzer.search_channel_by_name("Let's Media Oficia")
+        channel_id = analyzer.search_channel_by_name("Let's Media Oficial")
         if channel_id:
             analyzer.channel_id = channel_id
             return analyzer
         else:
             st.error("Canal não encontrado via busca por nome. Tentando URL alternativa...")
             # Tenta usar o URL como fallback
-            return YouTubeAnalytics(API_KEY, channel_url='https://www.youtube.com/@LetsMediaOficia')
+            return YouTubeAnalytics(API_KEY, channel_url='https://www.youtube.com/@LetsMediaOficial')
 
     analyzer = get_analyzer()
 
