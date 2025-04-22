@@ -1,0 +1,50 @@
+# Arquivos e diretórios Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Ambiente virtual
+venv/
+ENV/
+env/
+
+# Arquivos PyCharm e VSCode
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Configurações locais e chaves
+.env
+.env.local
+.env.*.local
+
+# Notebooks Jupyter
+.ipynb_checkpoints
+
+# Arquivos de cache
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db 
