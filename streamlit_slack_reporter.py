@@ -27,7 +27,7 @@ SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL", "#youtube-analytics")
 
 # Configuração da API
 API_KEY = 'AIzaSyCswbMKKorlHVSA_9kWSS9ZIKogaurZdNA'
-CHANNEL_URL = 'https://www.youtube.com/@LetsMediaOficial'
+CHANNEL_URL = 'https://youtube.com/@letsmediaoficial?si=Fk-kf1JqYBjj2LA0'
 
 class StreamlitSlackReporter:
     def __init__(self, token=SLACK_API_TOKEN, channel=SLACK_CHANNEL):

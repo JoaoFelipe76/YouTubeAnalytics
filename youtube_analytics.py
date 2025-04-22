@@ -81,13 +81,46 @@ class YouTubeAnalytics:
         return None
     
     def _extract_channel_id(self, url):
-        # Extrair channel ID de diferentes formatos de URL
-        if 'channel/' in url:
-            return url.split('channel/')[-1].split('/')[0]
-        elif 'user/' in url:
-            username = url.split('user/')[-1].split('/')[0]
-            return self._get_channel_id_from_username(username)
-        return None
+        """Extrai o ID do canal de diferentes formatos de URL"""
+        try:
+            # Caso 1: URLs com '/channel/' - contém ID diretamente
+            if 'channel/' in url:
+                return url.split('channel/')[-1].split('/')[0].split('?')[0]
+                
+            # Caso 2: URLs com handle (@nome)
+            if '@' in url:
+                handle = url.split('@')[-1].split('?')[0].split('/')[0]
+                print(f"Extraindo handle: @{handle}")
+                
+                # Busca direta pelo handle
+                request = self.youtube.search().list(
+                    part="snippet",
+                    q=f"@{handle}",
+                    type="channel",
+                    maxResults=5
+                )
+                response = request.execute()
+                
+                # Tenta encontrar uma correspondência exata ou próxima
+                for item in response.get('items', []):
+                    if item['snippet'].get('customUrl', '').lower() == f"@{handle}".lower():
+                        return item['snippet']['channelId']
+                
+                # Se não achou correspondência exata, pega o primeiro resultado
+                if response.get('items'):
+                    print(f"Canal encontrado: {response['items'][0]['snippet']['title']}")
+                    return response['items'][0]['snippet']['channelId']
+            
+            # Caso 3: URLs com '/user/' - precisa buscar pelo username
+            if 'user/' in url:
+                username = url.split('user/')[-1].split('/')[0].split('?')[0]
+                return self._get_channel_id_from_username(username)
+                
+            # Tenta outros métodos se necessário
+            return None
+        except Exception as e:
+            print(f"Erro ao extrair ID do canal da URL: {e}")
+            return None
     
     def get_channel_info(self):
         try:

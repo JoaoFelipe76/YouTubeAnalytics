@@ -19,24 +19,16 @@ st.set_page_config(
 
 # Configuração da API
 API_KEY = 'AIzaSyCswbMKKorlHVSA_9kWSS9ZIKogaurZdNA'
+CHANNEL_URL = 'https://youtube.com/@letsmediaoficial?si=Fk-kf1JqYBjj2LA0'
 
 # Título principal
 st.title("Análise do Canal Let's Media Oficial")
 
 try:
-    # Inicialização da classe de análise usando busca direta
+    # Inicialização da classe de análise usando a URL exata
     @st.cache_resource
     def get_analyzer():
-        analyzer = YouTubeAnalytics(API_KEY)
-        # Busca o canal pelo nome exato
-        channel_id = analyzer.search_channel_by_name("Let's Media Oficial")
-        if channel_id:
-            analyzer.channel_id = channel_id
-            return analyzer
-        else:
-            st.error("Canal não encontrado via busca por nome. Tentando URL alternativa...")
-            # Tenta usar o URL como fallback
-            return YouTubeAnalytics(API_KEY, channel_url='https://www.youtube.com/@LetsMediaOficial')
+        return YouTubeAnalytics(API_KEY, channel_url=CHANNEL_URL)
 
     analyzer = get_analyzer()
 
