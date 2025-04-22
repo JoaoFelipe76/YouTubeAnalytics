@@ -19,6 +19,34 @@ class YouTubeAnalytics:
             else:
                 self.channel_id = self._extract_channel_id(channel_url)
     
+    def search_channel_by_name(self, channel_name):
+        """Busca o canal diretamente pelo nome exato"""
+        try:
+            print(f"Buscando canal pelo nome: {channel_name}")
+            request = self.youtube.search().list(
+                part="snippet",
+                q=channel_name,
+                type="channel",
+                maxResults=5
+            )
+            response = request.execute()
+            
+            # Procura por correspondência exata no nome
+            for item in response.get('items', []):
+                title = item['snippet']['title']
+                print(f"Encontrado canal: {title}")
+                if title.lower() == channel_name.lower() or title.lower().startswith(channel_name.lower()):
+                    return item['snippet']['channelId']
+            
+            # Se não encontrou uma correspondência exata, retorna o primeiro resultado
+            if response.get('items'):
+                return response['items'][0]['snippet']['channelId']
+                
+            return None
+        except HttpError as e:
+            print(f"Erro ao buscar canal pelo nome: {e}")
+            return None
+    
     def _get_channel_id_from_handle(self, handle):
         """Busca o ID do canal a partir do handle (@nome)"""
         try:
