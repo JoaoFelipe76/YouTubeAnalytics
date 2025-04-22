@@ -3,7 +3,8 @@ Análise de Canal do YouTube - Aplicação Principal
 """
 import sys
 import os
-from analytics_dashboard import app
+import streamlit.web.bootstrap as bootstrap
+from streamlit.web.server import Server
 
 def main():
     """Função principal para iniciar a aplicação"""
@@ -11,7 +12,7 @@ def main():
     
     try:
         # Verificar se as dependências estão instaladas
-        import dash
+        import streamlit
         import pandas as pd
         import numpy as np
         import plotly
@@ -19,12 +20,11 @@ def main():
         
         print("Todas as dependências estão instaladas.")
         
-        # Configurar porta para o Heroku
-        port = int(os.environ.get("PORT", 8050))
+        # Iniciar o servidor Streamlit
+        print("Iniciando o dashboard Streamlit...")
         
-        # Iniciar o servidor
-        print(f"Iniciando o dashboard em porta {port}")
-        app.run_server(host="0.0.0.0", port=port, debug=False)
+        # Usar o arquivo streamlit_app.py como ponto de entrada
+        bootstrap.run("streamlit_app.py", "", [], {})
         
     except ImportError as e:
         print(f"Erro: {e}")
@@ -35,9 +35,6 @@ def main():
         return 1
     
     return 0
-
-# Disponibilizar app.server para Heroku
-server = app.server
 
 if __name__ == "__main__":
     sys.exit(main()) 

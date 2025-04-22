@@ -14,25 +14,17 @@ class YouTubeAnalytics:
         if channel_url and not channel_id:
             # Extrair channel ID da URL se fornecida
             if '@' in channel_url:
-                username = channel_url.split('@')[-1]
-                self.channel_id = self._get_channel_id_from_username(username)
+                handle = channel_url.split('@')[-1]
+                self.channel_id = self._get_channel_id_from_handle(handle)
             else:
                 self.channel_id = self._extract_channel_id(channel_url)
     
-    def _get_channel_id_from_username(self, username):
-        request = self.youtube.channels().list(
-            part="id",
-            forUsername=username
-        )
-        response = request.execute()
-        
-        if response.get('items'):
-            return response['items'][0]['id']
-        else:
-            # Tenta buscar pelo handle
+    def _get_channel_id_from_handle(self, handle):
+        """Busca o ID do canal a partir do handle (@nome)"""
+        try:
             request = self.youtube.search().list(
                 part="snippet",
-                q=f"@{username}",
+                q=f"@{handle}",
                 type="channel",
                 maxResults=1
             )
@@ -40,7 +32,24 @@ class YouTubeAnalytics:
             
             if response.get('items'):
                 return response['items'][0]['snippet']['channelId']
-        
+        except HttpError as e:
+            print(f"Erro ao buscar handle do canal: {e}")
+            
+        return None
+    
+    def _get_channel_id_from_username(self, username):
+        try:
+            request = self.youtube.channels().list(
+                part="id",
+                forUsername=username
+            )
+            response = request.execute()
+            
+            if response.get('items'):
+                return response['items'][0]['id']
+        except HttpError as e:
+            print(f"Erro ao buscar username do canal: {e}")
+            
         return None
     
     def _extract_channel_id(self, url):
@@ -54,6 +63,10 @@ class YouTubeAnalytics:
     
     def get_channel_info(self):
         try:
+            if not self.channel_id:
+                print("ID do canal não encontrado")
+                return None
+                
             request = self.youtube.channels().list(
                 part="snippet,contentDetails,statistics",
                 id=self.channel_id
